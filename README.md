@@ -42,21 +42,23 @@ cd knights-backend-logger
 
 2. Monte a imagem e rode:
 ```bash
-# EventLogger
-docker build -t knights-challenge-logger .
-docker run -it --rm -p 5044:8080 --name KnightsChallengeLoggercontainer knights-challenge-logger
-
-# Postgres
+# Run Postgres container
 docker run --name some-postgres -p 5430:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres
 
-# Kafka
-docker run -p 9092:9092 apache/kafka:3.9.0
+# Run Kafka container
+docker run -d --name broker -p 9092:9092 apache/kafka:latest
+# Setup kafka topics
+docker exec --workdir /opt/kafka/bin/ -it broker sh
+./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic auth-logs
+
+# Run EventLogger microservice
+docker build -t knights-challenge-logger .
+docker run -it --rm -p 5044:8080 --name KnightsChallengeLoggercontainer knights-challenge-logger
 
 # # Kafka with web ui
 # docker run -d -p 9000:9000 \
 #   -e KAFKA_BROKERCONNECT=localhost:9092 \
 #   obsidiandynamics/kafdrop
-
 ```
 
 3. Não esqueça de montar os seguintes projetos 
