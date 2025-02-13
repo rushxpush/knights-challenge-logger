@@ -49,7 +49,7 @@ docker run --name some-postgres -p 5430:5432 -e POSTGRES_PASSWORD=mysecretpasswo
 docker run -d --name broker -p 9092:9092 apache/kafka:latest
 # Setup kafka topics
 docker exec --workdir /opt/kafka/bin/ -it broker sh
-./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic auth-logs
+./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic auth.login.events
 
 # Run EventLogger microservice
 docker build -t knights-challenge-logger .
