@@ -1,4 +1,6 @@
 ﻿using Confluent.Kafka;
+using knights_challenge_logger.Models;
+using System.Text.Json;
 
 namespace knights_challenge_logger.Consumers
 {
@@ -7,7 +9,7 @@ namespace knights_challenge_logger.Consumers
 
         private readonly ILogger<KafkaAuthLogConsumer> _log;
         private readonly IServiceProvider _serviceProvider;
-        private readonly string _topic = "auth-logs";
+        private readonly string _topic = "logs.auth";
 
         public KafkaAuthLogConsumer(ILogger<KafkaAuthLogConsumer> log, IServiceProvider serviceProvider)
         {
@@ -21,7 +23,13 @@ namespace knights_challenge_logger.Consumers
         {
             using var scope = _serviceProvider.CreateScope();
             var consumer = scope.ServiceProvider.GetRequiredService<IConsumer<string, string>>();
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            
             consumer.Subscribe(_topic);
+
 
             System.Diagnostics.Debug.WriteLine($"✅ Subscribed to topic: {_topic}");
 
@@ -41,6 +49,10 @@ namespace knights_challenge_logger.Consumers
 
                     if (consumeResult != null && consumeResult.Message != null)
                     {
+
+                        
+                        var logMessage = JsonSerializer.Deserialize<AuthLogMessage>(consumeResult.Message.Value, jsonSerializerOptions);
+
                         _log.LogInformation($"📩Received: {consumeResult.Message.Key} - {consumeResult.Message.Value}");
                         System.Diagnostics.Debug.WriteLine($"📩Received: {consumeResult.Message.Key} - {consumeResult.Message.Value}");
 
@@ -70,7 +82,6 @@ namespace knights_challenge_logger.Consumers
             _log.LogError("🛑Kafka Consumer Stopped.");
             System.Diagnostics.Debug.WriteLine("🛑Dispose: Kafka Consumer Stopped.");
             base.Dispose();
-
         }
 
     }
