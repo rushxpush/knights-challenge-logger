@@ -4,14 +4,14 @@ using System.Text.Json;
 
 namespace knights_challenge_logger.Consumers
 {
-    internal class KafkaAuthLogConsumer : BackgroundService
+    internal class AuthLogConsumer : BackgroundService
     {
 
-        private readonly ILogger<KafkaAuthLogConsumer> _log;
+        private readonly ILogger<AuthLogConsumer> _log;
         private readonly IServiceProvider _serviceProvider;
-        private readonly string _topic = "logs.auth";
+        private readonly string _topic = "auth.login.events";
 
-        public KafkaAuthLogConsumer(ILogger<KafkaAuthLogConsumer> log, IServiceProvider serviceProvider)
+        public AuthLogConsumer(ILogger<AuthLogConsumer> log, IServiceProvider serviceProvider)
         {
             _log = log;
             _serviceProvider = serviceProvider;
@@ -51,7 +51,7 @@ namespace knights_challenge_logger.Consumers
                     {
 
                         
-                        var logMessage = JsonSerializer.Deserialize<AuthLogMessage>(consumeResult.Message.Value, jsonSerializerOptions);
+                        var logMessage = JsonSerializer.Deserialize<Models.LogMessage>(consumeResult.Message.Value, jsonSerializerOptions);
 
                         _log.LogInformation($"📩Received: {consumeResult.Message.Key} - {consumeResult.Message.Value}");
                         System.Diagnostics.Debug.WriteLine($"📩Received: {consumeResult.Message.Key} - {consumeResult.Message.Value}");

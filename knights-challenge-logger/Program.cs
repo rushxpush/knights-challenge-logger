@@ -1,5 +1,6 @@
 using Confluent.Kafka;
 using knights_challenge_logger.Consumers;
+
 System.Diagnostics.Debug.WriteLine("--------Test----------");
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,7 +28,7 @@ builder.Services.AddSingleton<IConsumer<string, string>>(sp =>
 
 
 // Register background worker
-builder.Services.AddHostedService<KafkaAuthLogConsumer>();
+builder.Services.AddHostedService<AuthLogConsumer>();
 
 
 
